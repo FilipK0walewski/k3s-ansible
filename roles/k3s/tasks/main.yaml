@@ -1,0 +1,37 @@
+- name: Check if k3s is installed
+  stat:
+    path: /usr/local/bin/k3s
+  register: k3s_check
+
+- name: Install k3s server
+  shell: |
+    curl -sfL https://get.k3s.io | sh -
+    echo "k3s server installed"
+  when: k3s_role == "server" and not k3s_check.stat.exists
+
+- name: Fetch server node token
+  slurp:
+    src: /var/lib/rancher/k3s/server/node-token
+  register: k3s_token_file
+  when: k3s_role == "server"
+
+- name: Set decoded server token
+  set_fact:
+    k3s_token_decoded: "{{ k3s_token_file.content | b64decode }}"
+  when: k3s_role == "server"
+
+- name: Show server token
+  debug:
+    msg: "Server token is {{ hostvars[groups['k3s_server'][0]].k3s_token_decoded }}"
+
+- name: Install k3s agent
+  shell: |
+    curl -sfL https://get.k3s.io | sh -
+    echo "Connecting to server at {{ hostvars[groups['k3s_server'][0]].ansible_host }}"
+    echo "k3s agent installed"
+  args:
+    executable: /bin/bash
+  environment:
+    K3S_URL: "https://{{ hostvars[groups['k3s_server'][0]].ansible_host }}:6443"
+    K3S_TOKEN: "{{ hostvars[groups['k3s_server'][0]].k3s_token_decoded }}"
+  when: k3s_role == "agent" and not k3s_check.stat.exists

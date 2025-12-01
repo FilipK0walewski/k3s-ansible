@@ -1,0 +1,9 @@
+- name: Check if helm is installed
+  stat:
+    path: /usr/local/bin/helm
+  register: helm_check
+
+- name: Install Helm
+  shell: |
+    curl -s https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-4 | bash
+  when: not k3s_check.stat.exists

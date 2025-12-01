@@ -1,0 +1,30 @@
+- name: Install cert-manager via Helm
+  shell: |
+    helm upgrade --install \
+      cert-manager oci://quay.io/jetstack/charts/cert-manager \
+      --version {{ cert_manager.version}} \
+      --namespace {{ cert_manager.namespace }} \
+      --create-namespace \
+      --set crds.enabled=true
+  args:
+    executable: /bin/bash
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+
+- name: Apply Cloudflare secret
+  kubernetes.core.k8s:
+    state: present
+    template: "{{ role_path }}/templates/cloudflare-secret.j2"
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+
+- name: Apply ClusterIssuer manifest
+  kubernetes.core.k8s:
+    state: present
+    template: "{{ role_path }}/templates/cluster-issuer.j2"
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+
+- name: Apply wildcard certificate manifest
+  kubernetes.core.k8s:
+    state: present
+    template: "{{ role_path }}/templates/wildcard-cert.j2"
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
