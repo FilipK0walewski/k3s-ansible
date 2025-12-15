@@ -1,2 +1,0 @@
-k3s_role: server
-k3s_server_url: "https://192.168.11.12:6443"

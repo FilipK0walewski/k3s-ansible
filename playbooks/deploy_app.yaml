@@ -1,7 +1,0 @@
-- hosts: all
-  vars:
-    app_role_name: "{{ app_name }}"
-  tasks:
-    - name: Include app role dynamically
-      include_role:
-        name: "{{ app_role_name }}"

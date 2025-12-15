@@ -1,0 +1,47 @@
+- name: Install NFS server
+  apt:
+    name: nfs-kernel-server
+    state: present
+    update_cache: yes
+
+- name: Ensure NFS mount directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: nobody
+    group: nogroup
+    mode: "0777"
+  loop:
+    - /srv/nfs/hdd
+    - /srv/nfs/nvme
+
+- name: Add fstab entries for NFS disks
+  lineinfile:
+    path: /etc/fstab
+    line: "{{ item }}"
+    state: present
+    create: yes
+  loop:
+    - "UUID=29b77868-d810-49d1-959f-2eec358b9416 /srv/nfs/hdd ext4 defaults 0 2"
+    - "UUID=06ae26e8-1e45-47a4-b189-60309810eecb /srv/nfs/nvme ext4 defaults,noatime,discard 0 2"
+
+- name: Mount all filesystems from fstab
+  command: mount -a
+
+- name: Configure NFS exports
+  lineinfile:
+    path: /etc/exports
+    line: "{{ item }}"
+    create: yes
+  loop:
+    - "/srv/nfs/hdd *(rw,sync,no_subtree_check,no_root_squash)"
+    - "/srv/nfs/nvme *(rw,sync,no_subtree_check,no_root_squash)"
+
+- name: Apply NFS exports
+  command: exportfs -a
+
+- name: Enable NFS server
+  systemd:
+    name: nfs-kernel-server
+    state: started
+    enabled: yes

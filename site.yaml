@@ -1,0 +1,5 @@
+- hosts: k3s_server
+  roles:
+    - nfs
+    - k3s
+    - helm

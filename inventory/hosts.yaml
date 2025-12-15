@@ -3,8 +3,13 @@ all:
     k3s_server:
       hosts:
         carbomba:
-          ansible_host: 192.168.11.12
+          ansible_host: c
           ansible_user: filip
-          ansible_ssh_private_key_file: ~/.ssh/carbomba
+          ansible_become: true
+          ansible_python_interpreter: /usr/bin/python3.13
+    cloud:
+      hosts:
+        vps:
+          ansible_host: vps
           ansible_become: true
           ansible_python_interpreter: /usr/bin/python3.13

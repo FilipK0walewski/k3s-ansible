@@ -6,4 +6,4 @@
 - name: Install Helm
   shell: |
     curl -s https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-4 | bash
-  when: not k3s_check.stat.exists
+  when: not helm_check.stat.exists

@@ -1,6 +1,0 @@
-app_name: nginx-test
-namespace: nginx-test
-replicas: 1
-image: nginx:latest
-service_port: 80
-host: nginx-test.d.32123.pl

@@ -1,9 +1,0 @@
-- name: k3s helm cert manager
-  hosts: k3s_server
-  become: true
-  vars_files:
-    - inventory/group_vars/vault.yaml
-  roles:
-    - roles/k3s
-    - roles/helm
-    - roles/certmanager
