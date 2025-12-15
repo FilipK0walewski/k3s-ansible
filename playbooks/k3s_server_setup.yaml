@@ -1,6 +1,7 @@
-- name: k3s helm cert manager
+- name: k3s helm nfs
   hosts: k3s_server
   become: true
   roles:
+    - roles/nfs
     - roles/k3s
     - roles/helm
