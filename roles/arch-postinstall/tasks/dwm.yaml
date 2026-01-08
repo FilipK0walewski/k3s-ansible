@@ -1,3 +1,8 @@
+- name: Remove old dwm files if exists
+  file:
+    path: "{{ src_dir }}/dwm"
+    state: absent
+
 - name: Clone dwm
   git:
     repo: "{{ dwm_repo }}"
@@ -5,17 +10,25 @@
     version: master
   become_user: "{{ user }}"
 
+- name: Ensure directory exists
+  file:
+    path: "{{ src_dir }}/dwm/patches"
+    state: directory
+    mode: '0755'
+    owner: "{{ user }}"
+    group: "{{ user }}"
+
 - name: Copy dwm patches
   copy:
     src: "patches/dwm/{{ item }}"
-    dest: "{{ src_dir }}/dwm/{{ item }}"
+    dest: "{{ src_dir }}/dwm/patches/{{ item }}"
   loop: "{{ dwm_patches }}"
   when: dwm_patches | length > 0
 
 - name: Apply dwm patches
   shell: |
     grep -q "{{ item }}" .applied_patches 2>/dev/null && exit 0
-    patch -p1 < {{ item }}
+    patch -p1 < patches/{{ item }}
     echo "{{ item }}" >> .applied_patches
   args:
     chdir: "{{ src_dir }}/dwm"

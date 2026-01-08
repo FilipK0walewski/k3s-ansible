@@ -6,6 +6,8 @@
       - pipewire-pulse
       - wireplumber
       - alsa-utils
+      - pamixer
+      - pavucontrol
     state: present
 
 - name: Enable PipeWire services for user

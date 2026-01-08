@@ -9,7 +9,7 @@ slstatus_repo: https://git.suckless.org/slstatus
 
 
 dmenu_patches: []
-dwm_patches: []
+dwm_patches: [dwm-config.patch]
 st_patches: []
 
 wallpaper_file: wallpaper.jpg
