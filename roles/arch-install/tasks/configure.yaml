@@ -1,0 +1,102 @@
+- name: Set timezone
+  command: arch-chroot /mnt ln -sf /usr/share/zoneinfo/{{ timezone }} /etc/localtime
+
+- name: Generate /etc/adjtime
+  command: arch-chroot /mnt hwclock --systohc
+
+- name: Set locale in /etc/locale.gen
+  lineinfile:
+    path: /mnt/etc/locale.gen
+    regexp: '^#en_US.UTF-8'
+    line: 'en_US.UTF-8 UTF-8'
+
+- name: Generate locales
+  command: arch-chroot /mnt locale-gen
+
+- name: Set LANG variable
+  copy:
+    dest: /mnt/etc/locale.conf
+    content: "LANG=en_US.UTF-8\n"
+
+- name: Set hostname
+  copy:
+    dest: /mnt/etc/hostname
+    content: "{{ hostname }}\n"
+
+- name: Update /etc/hosts
+  copy:
+    dest: /mnt/etc/hosts
+    content: |
+      127.0.0.1   localhost
+      ::1         localhost
+      127.0.1.1   {{ hostname }}.localdomain {{ hostname }}
+
+# ------------------------------
+# Users & sudo
+# ------------------------------
+
+- name: Create user
+  command: arch-chroot /mnt useradd -m -G wheel -s /bin/bash {{ username }}
+
+- name: Set password for user
+  command: arch-chroot /mnt bash -c "echo '{{ username }}:{{ user_password }}' | chpasswd"
+
+- name: Set password for root
+  command: arch-chroot /mnt bash -c "echo 'root:{{ root_password }}' | chpasswd"
+
+- name: Ensure sudo group can sudo without password (optional)
+  lineinfile:
+    path: /mnt/etc/sudoers
+    regexp: '^# %wheel ALL=\(ALL\) NOPASSWD: ALL'
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+
+# ------------------------------
+# Enable essential services
+# ------------------------------
+
+- name: Enable systemd-networkd
+  command: arch-chroot /mnt systemctl enable systemd-networkd
+
+- name: Enable systemd-resolved
+  command: arch-chroot /mnt systemctl enable systemd-resolved
+
+# - name: Link resolv.conf to systemd-resolved
+#   file:
+#     path: /mnt/etc/resolv.conf
+#     src: /run/systemd/resolve/stub-resolv.conf
+#     state: link
+
+- name: Enable SSH daemon
+  command: arch-chroot /mnt systemctl enable sshd
+
+# ------------------------------
+# Network bridge for VMs
+# ------------------------------
+
+- name: Create br0 netdev
+  copy:
+    dest: /mnt/etc/systemd/network/10-br0.netdev
+    content: |
+      [NetDev]
+      Name=br0
+      Kind=bridge
+
+- name: Configure br0 network (DHCP)
+  copy:
+    dest: /mnt/etc/systemd/network/10-br0.network
+    content: |
+      [Match]
+      Name=br0
+
+      [Network]
+      DHCP=yes
+
+- name: Configure physical NIC for bridge
+  copy:
+    dest: /mnt/etc/systemd/network/10-enp6s0.network
+    content: |
+      [Match]
+      Name=enp6s0
+
+      [Network]
+      Bridge=br0

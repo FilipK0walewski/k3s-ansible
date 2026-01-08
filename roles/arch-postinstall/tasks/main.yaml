@@ -1,0 +1,9 @@
+- import_tasks: xorg.yaml
+# - import_tasks: fonts.yaml
+# - import_tasks: dmenu.yaml
+# - import_tasks: st.yaml
+# - import_tasks: slock.yaml
+# - import_tasks: slstatus.yaml
+# - import_tasks: audio.yaml
+# - import_tasks: wallpaper.yaml
+# - import_tasks: dwm.yaml

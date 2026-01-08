@@ -1,0 +1,35 @@
+- name: Clone dwm
+  git:
+    repo: "{{ dwm_repo }}"
+    dest: "{{ src_dir }}/dwm"
+    version: master
+  become_user: "{{ user }}"
+
+- name: Copy dwm patches
+  copy:
+    src: "patches/dwm/{{ item }}"
+    dest: "{{ src_dir }}/dwm/{{ item }}"
+  loop: "{{ dwm_patches }}"
+  when: dwm_patches | length > 0
+
+- name: Apply dwm patches
+  shell: |
+    grep -q "{{ item }}" .applied_patches 2>/dev/null && exit 0
+    patch -p1 < {{ item }}
+    echo "{{ item }}" >> .applied_patches
+  args:
+    chdir: "{{ src_dir }}/dwm"
+  become_user: "{{ user }}"
+  loop: "{{ dwm_patches }}"
+  when: dwm_patches | length > 0
+
+- name: Build dwm
+  shell: make clean
+  args:
+    chdir: "{{ src_dir }}/dwm"
+  become_user: "{{ user }}"
+
+- name: Install dwm
+  make:
+    chdir: "{{ src_dir }}/dwm"
+    target: install

@@ -1,0 +1,4 @@
+- hosts: arch-live
+  become: true
+  roles:
+    - arch-install

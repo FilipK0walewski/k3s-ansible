@@ -1,0 +1,31 @@
+- name: Install feh
+  pacman:
+    name: feh
+    state: present
+    update_cache: yes
+
+- name: Ensure image directory exists
+  file:
+    path: /home/{{ user }}/.local/images
+    state: directory
+
+- name: Copy wallpaper to user's home
+  copy:
+    src: "{{ wallpaper_file }}"
+    dest: "/home/{{ user }}/.local/images/{{ wallpaper_file }}"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: "0644"
+
+- name: Update ~/.xinitrc to load wallpaper, Xresources, and dwm
+  lineinfile:
+    path: "/home/{{ user }}/.xinitrc"
+    create: yes
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: "0755"
+    line: |
+      
+      [ -f ~/.Xresources ] && xrdb -merge ~/.Xresources
+      exec dwm
+    state: present

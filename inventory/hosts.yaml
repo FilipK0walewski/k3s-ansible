@@ -1,5 +1,17 @@
 all:
   children:
+    pc:
+      hosts:
+        arch-live:
+          ansible_user: root
+          ansible_host: 192.168.11.102
+          ansible_python_interpreter: /usr/bin/python
+          ansible_become: true
+        steam-machine:
+          ansible_user: filip
+          ansible_host: 192.168.11.243
+          ansible_python_interpreter: /usr/bin/python
+          ansible_become: true
     k3s_server:
       hosts:
         carbomba:

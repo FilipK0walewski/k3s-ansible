@@ -1,0 +1,4 @@
+- hosts: steam-machine
+  become: true
+  roles:
+    - arch-postinstall

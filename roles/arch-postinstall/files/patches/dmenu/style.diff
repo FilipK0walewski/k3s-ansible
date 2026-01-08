@@ -1,0 +1,24 @@
+diff --git a/config.def.h b/config.def.h
+index 1edb647..e0ab930 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -4,14 +4,14 @@
+ static int topbar = 1;                      /* -b  option; if 0, dmenu appears at bottom     */
+ /* -fn option overrides fonts[0]; default X11 font or font set */
+ static const char *fonts[] = {
+-	"monospace:size=10"
++    "JetBrainsMono Nerd Font:size=16"
+ };
+ static const char *prompt      = NULL;      /* -p  option; prompt to the left of input field */
+ static const char *colors[SchemeLast][2] = {
+-	/*     fg         bg       */
+-	[SchemeNorm] = { "#bbbbbb", "#222222" },
+-	[SchemeSel] = { "#eeeeee", "#005577" },
+-	[SchemeOut] = { "#000000", "#00ffff" },
++    /*               fg         bg       */
++    [SchemeNorm] = { "#CBD5E1", "#1E1B4B" }, // soft light fg on deep indigo bg
++    [SchemeSel]  = { "#1E1B4B", "#7C3AED" }, // inverted: indigo fg on violet-indigo bg
++    [SchemeOut]  = { "#1E1B4B", "#A78BFA" }, // softer lilac for output
+ };
+ /* -l option; if nonzero, dmenu uses vertical list with given number of lines */
+ static unsigned int lines      = 0;

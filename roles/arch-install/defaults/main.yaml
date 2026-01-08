@@ -1,0 +1,10 @@
+disk_device: /dev/nvme0n1
+efi_size: 1GiB
+swap_size: 4GiB
+
+hostname: steam-machine
+timezone: Europe/Warsaw
+
+username: filip
+user_password: 1122
+root_password: 1122

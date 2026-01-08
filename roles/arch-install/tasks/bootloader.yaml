@@ -1,0 +1,22 @@
+- name: Install bootloader packages
+  command: arch-chroot /mnt pacman -S --noconfirm grub efibootmgr os-prober
+
+- name: Install GRUB for UEFI
+  command: arch-chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
+
+- name: Generate GRUB config
+  command: arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
+
+- name: Run os-prober (optional)
+  command: arch-chroot /mnt os-prober
+  ignore_errors: true
+
+- name: Verify EFI contents
+  stat:
+    path: /mnt/boot/EFI/GRUB
+  register: efi_check
+
+- assert:
+    that:
+      - efi_check.stat.exists
+    fail_msg: "GRUB installation failed or EFI directory missing"

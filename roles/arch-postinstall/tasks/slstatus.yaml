@@ -1,0 +1,18 @@
+- name: Clone slstatus
+  git:
+    repo: "{{ slstatus_repo }}"
+    dest: "{{ src_dir }}/slstatus"
+    version: master
+  become_user: "{{ user }}"
+
+- name: Build slstatus
+  shell: make clean
+  args:
+    chdir: "{{ src_dir }}/slstatus"
+  become_user: "{{ user }}"
+
+- name: Install slstatus
+  make:
+    chdir: "{{ src_dir }}/slstatus"
+    target: install
+ 

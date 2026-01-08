@@ -1,0 +1,70 @@
+- name: Ensure disk_device is defined
+  assert:
+    that:
+      - disk_device is defined
+      - disk_device | length > 0
+    fail_msg: "disk_device must be set (e.g., /dev/nvme0n1)"
+
+- name: Unmount anything under /mnt
+  command: umount -R /mnt
+  ignore_errors: true
+
+- name: swapoff if swap exists
+  command: swapoff -a
+
+- name: Wipe partition table
+  command: sgdisk --zap-all {{ disk_device }}
+
+- name: Create GPT partition table
+  command: parted -s {{ disk_device }} mklabel gpt
+
+# ---- EFI ----
+- name: Create EFI partition
+  command: parted -s {{ disk_device }} mkpart ESP fat32 1MiB {{ efi_size }}
+
+- name: Set EFI partition flag
+  command: parted -s {{ disk_device }} set 1 esp on
+
+# ---- SWAP ----
+- name: Create swap partition
+  command: parted -s {{ disk_device }} mkpart primary linux-swap {{ efi_size }} {{ swap_size }}
+
+# ---- ROOT ----
+- name: Create root partition
+  command: parted -s {{ disk_device }} mkpart primary {{ swap_size }} 100%
+
+- name: Set partition paths
+  set_fact:
+    efi_part: "{{ disk_device }}p1"
+    swap_part: "{{ disk_device }}p2"
+    root_part: "{{ disk_device }}p3"
+
+# ---- Format partitions ----
+- name: Format EFI partition
+  command: mkfs.fat -F32 {{ efi_part }}
+
+- name: Format root partition
+  command: mkfs.ext4 {{ root_part }}
+
+- name: Create swap
+  command: mkswap {{ swap_part }}
+
+- name: Enable swap
+  command: swapon {{ swap_part }}
+
+# ---- Mount target ----
+- name: Create mountpoint for root
+  file:
+    path: /mnt
+    state: directory
+
+- name: Mount root partition
+  command: mount {{ root_part }} /mnt
+
+- name: Create boot mountpoint
+  file:
+    path: /mnt/boot
+    state: directory
+
+- name: Mount EFI partition
+  command: mount {{ efi_part }} /mnt/boot

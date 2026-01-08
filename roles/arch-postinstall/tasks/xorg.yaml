@@ -1,0 +1,26 @@
+- name: Install Xorg and dependencies
+  pacman:
+    name:
+      - xorg-server
+      - xorg-xinit
+      - git
+      - base-devel
+      - libx11
+      - libxft
+      - libxinerama
+      - xorg-xrandr
+    state: present
+    update_cache: yes
+
+- name: Create .xinitrc for user
+  copy:
+    dest: "/home/{{ user }}/.xinitrc"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: "0755"
+    content: |
+      #!/bin/sh
+      feh --bg-scale /home/{{ user }}/.local/images/{{ wallpaper_file }} &
+      slstatus &
+      xrandr --output HDMI-1 --mode 1920x1080 --rate 120
+      exec dwm

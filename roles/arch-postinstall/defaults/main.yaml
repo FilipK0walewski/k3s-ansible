@@ -1,0 +1,15 @@
+user: filip
+src_dir: "/home/{{ user }}/.local/src"
+
+dmenu_repo: https://git.suckless.org/dmenu
+dwm_repo: https://git.suckless.org/dwm
+st_repo: https://git.suckless.org/st
+slock_repo: https://git.suckless.org/slock
+slstatus_repo: https://git.suckless.org/slstatus
+
+
+dmenu_patches: []
+dwm_patches: []
+st_patches: []
+
+wallpaper_file: wallpaper.jpg

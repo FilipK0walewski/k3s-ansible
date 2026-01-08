@@ -1,0 +1,7 @@
+- name: Install fonts
+  pacman:
+    name:
+      - ttf-dejavu
+      - noto-fonts
+      - terminus-font
+    state: present

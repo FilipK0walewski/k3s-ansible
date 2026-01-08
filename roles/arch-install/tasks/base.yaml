@@ -1,0 +1,17 @@
+- name: ensure the system clock is synchronized
+  command: timedatectl
+
+- name: Install base packages
+  command: pacstrap /mnt base linux linux-firmware
+  args:
+    creates: /mnt/bin
+
+- name: Install more packages
+  command: >
+    pacstrap /mnt
+    vim sudo openssh amd-ucode base-devel htop tmux powertop python
+  args:
+    creates: /mnt/usr/bin/vim
+
+- name: Generate fstab
+  shell: genfstab -U /mnt >> /mnt/etc/fstab

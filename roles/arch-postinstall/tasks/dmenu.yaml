@@ -1,0 +1,42 @@
+- name: Ensure source dir exists
+  file:
+    path: "{{ src_dir }}"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+
+- name: Clone dmenu
+  git:
+    repo: "{{ dmenu_repo }}"
+    dest: "{{ src_dir }}/dmenu"
+    version: master
+  become_user: "{{ user }}"
+
+- name: Copy dmenu patches
+  copy:
+    src: "patches/dmenu/{{ item }}"
+    dest: "{{ src_dir }}/dmenu/{{ item }}"
+  loop: "{{ dmenu_patches }}"
+  when: dmenu_patches | length > 0
+
+- name: Apply dmenu patches
+  shell: |
+    grep -q "{{ item }}" .applied_patches 2>/dev/null && exit 0
+    patch -p1 < {{ item }}
+    echo "{{ item }}" >> .applied_patches
+  args:
+    chdir: "{{ src_dir }}/dmenu"
+  become_user: "{{ user }}"
+  loop: "{{ dmenu_patches }}"
+  when: dmenu_patches | length > 0
+
+- name: Build dmenu
+  shell: make clean
+  args:
+    chdir: "{{ src_dir }}/dmenu"
+  become_user: "{{ user }}"
+
+- name: Install dmenu
+  make:
+    chdir: "{{ src_dir }}/dmenu"
+    target: install

@@ -1,0 +1,17 @@
+- name: Clone slock
+  git:
+    repo: "{{ slock_repo }}"
+    dest: "{{ src_dir }}/slock"
+    version: master
+  become_user: "{{ user }}"
+
+- name: Build slock
+  shell: make clean
+  args:
+    chdir: "{{ src_dir }}/slock"
+  become_user: "{{ user }}"
+
+- name: Install slock
+  make:
+    chdir: "{{ src_dir }}/slock"
+    target: install

@@ -1,0 +1,4 @@
+- import_tasks: disk.yaml
+- import_tasks: base.yaml
+- import_tasks: configure.yaml
+- import_tasks: bootloader.yaml
